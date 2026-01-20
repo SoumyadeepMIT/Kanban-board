@@ -1,5 +1,8 @@
+import Column from '@/components/Column';
+import CreateColumn from '@/components/CreateColumn';
 import { prisma } from '@/lib/prisma';
-import { headers } from 'next/dist/server/request/headers';
+import { headers } from 'next/headers';
+import Link from 'next/link';
 import React from 'react'
 
 interface Props{
@@ -17,35 +20,60 @@ const Board = async ({ params }: Props) => {
     }, 
     include: {
       columns: {
-        orderBy: {order: 'asc'}
+        orderBy: {order: 'asc'},
+        include: {
+          tasks: {
+            orderBy: {order: 'asc'},
+            select: {id: true, title: true, order: true}
+          }
+        }
       }
     }
   });
 
   if(!board){
-    return <div>Board not found or you do not have access to it.</div>
-  }
-  return (
-    <div className='min-h-screen bg-gray-50 p-8'>
-      <div className='max-w-7xl mx-auto'>
-        <div className='bg-white rounded-xl shadow-sm border p-6 mb-8'>
-          <h1 className='text-3xl font-bold text-gray-900'>{board.title}</h1>
-        </div>
-        <div className="flex gap-6 overflow-x-auto pb-4">
-          {board.columns.map((column) => (
-            <div key={column.id} className="bg-white min-w-70 rounded-xl shadow-sm border p-6 shrink-0">
-              <h2 className="font-semibold text-lg mb-4">{column.title}</h2>
-              <p className="text-gray-500 text-sm">No tasks</p>
-            </div>
-          ))}
-          
-          <div className="bg-gray-100 min-w-70 rounded-xl shadow-sm border p-6 shrink-0 text-center">
-            <button className="text-indigo-600 hover:text-indigo-700 font-medium">
-              + Add Column
-            </button>
-          </div>
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-indigo-100'>
+        <div className='text-center p-12'>
+          <h1 className='text-4xl font-bold text-gray-900 mb-4'>Board Not Found</h1>
+          <Link href="/boards" className='text-indigo-600 hover:text-indigo-700 font-semibold'>Back to Boards</Link>
         </div>
       </div>
+    )
+  }
+  return (
+    <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-100'>
+      <header className='border-b border-gray-200/50 bg-white/70 backdrop-blur-xl sticky top-0 z-50'>
+        <div className='max-w-7xl mx-auto px-6 py-6'>
+          <div className='flex items-center justify-between'>
+            <div>
+              <h1 className='text-4xl font-bold bg-gradient-to-r from-gray-900 to-slate-800 bg-clip-text text-transparent'>{board.title}</h1>
+              <p className='text-gray-500 mt-1'>{board.columns.reduce((sum,col) => sum + col.tasks.length, 0)} tasks </p>
+            </div> 
+            <Link href="/boards" className='px-6 py-3 text-sm font-semibold text-gray-700 bg-white/50 hover:bg-white rounded-xl border border-gray-200/50 hover:shadow-md transition-all'>All Boards</Link>
+          </div>
+        </div>
+      </header>
+      <main className='max-w-7xl mx-auto px-6 py-8'>
+        <div className='flex gap-6 overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent min-h-150'>
+          {board.columns.length === 0 ? (
+            <div className='flex-1 min-w-100 flex flex-col items-center justify-center py-20 bg-white/50 backdrop-blur-sm rounded-2xl border-2 border-dashed border-gray-300'>
+              <CreateColumn boardId={id}/>
+            </div>
+          ): (
+            <>
+              {board.columns.map((column) => (
+                <Column 
+                  key = {column.id}
+                  column = {column}
+                  boardId = {id}
+                />
+              ))}
+              <CreateColumn boardId={id}/>
+            </>
+          )}
+        </div>
+      </main>
     </div>
   )
 }
