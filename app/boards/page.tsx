@@ -2,6 +2,7 @@ import { createBoard } from '@/actions/boards';
 import BoardCard from '@/components/BoardCard';
 import BoardsClient from '@/components/BoardsClient';
 import { prisma } from '@/lib/prisma';
+import { Board } from '@prisma/client';
 import { headers } from 'next/headers'
 import Image from 'next/image';
 import React from 'react'
@@ -35,7 +36,7 @@ const Boards = async () => {
           </div>
         ) :
          (<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-          {boards.map((board) => (
+          {boards.map((board:Board) => (
             <BoardCard key={board.id} board={board} />
           ))}
          </div>)
