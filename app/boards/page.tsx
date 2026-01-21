@@ -36,7 +36,7 @@ const Boards = async () => {
           </div>
         ) :
          (<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-          {boards.map((board:Board) => (
+          {boards.map((board: any) => (
             <BoardCard key={board.id} board={board} />
           ))}
          </div>)
