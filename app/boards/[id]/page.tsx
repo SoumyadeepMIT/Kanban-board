@@ -48,7 +48,7 @@ const Board = async ({ params }: Props) => {
           <div className='flex items-center justify-between'>
             <div>
               <h1 className='text-4xl font-bold bg-gradient-to-r from-gray-900 to-slate-800 bg-clip-text text-transparent'>{board.title}</h1>
-              <p className='text-gray-500 mt-1'>{board.columns.reduce((sum,col) => sum + col.tasks.length, 0)} tasks </p>
+              <p className='text-gray-500 mt-1'>{board.columns.reduce((sum: number,col) => sum + col.tasks.length, 0)} tasks </p>
             </div> 
             <Link href="/boards" className='px-6 py-3 text-sm font-semibold text-gray-700 bg-white/50 hover:bg-white rounded-xl border border-gray-200/50 hover:shadow-md transition-all'>All Boards</Link>
           </div>
