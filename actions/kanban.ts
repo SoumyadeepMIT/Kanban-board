@@ -1,6 +1,7 @@
 'use server';
 
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
@@ -102,7 +103,7 @@ export const moveTask = async(formData: FormData) => {
     if (!task) throw new Error("Task not found");
 
     // Use a transaction to avoid unique constraint violations
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         // Step 1: Move the task to a temporary high order to avoid conflicts
         await tx.task.update({
             where: { id: taskId },
