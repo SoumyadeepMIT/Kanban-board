@@ -1,18 +1,40 @@
+'use client';
 import { deleteTask } from "@/actions/kanban";
 import { TaskMinimal } from "@/types";
-import React from "react";
+import React, { useState } from "react";
 
 interface Props {
   task: TaskMinimal;
+  columnId: string;
 }
 
-const TaskCard = ({ task }: Props) => {
+const TaskCard = ({ task, columnId }: Props) => {
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("taskId", task.id);
+    e.dataTransfer.setData("sourceColumnId", columnId);
+    setIsDragging(true);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
   return (
     <form action={deleteTask} className="group">
       <input type="hidden" name="taskId" value={task.id} />
-      <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-5 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 relative overflow-hidden">
-        {/* Drag handle (placeholder for DnD) */}
-        <div className="absolute left-4 top-4 w-1 h-6 bg-gradient-to-b from-gray-300 to-gray-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div
+        draggable
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        className={`bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl p-5 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 relative overflow-hidden cursor-move ${
+          isDragging ? "opacity-50 scale-95" : ""
+        }`}
+      >
+        {/* Drag handle */}
+        <div className="absolute left-4 top-4 w-1 h-6 bg-gradient-to-b from-indigo-400 to-indigo-500 rounded-full opacity-50 group-hover:opacity-100 transition-opacity" />
 
         {/* Content */}
         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight">

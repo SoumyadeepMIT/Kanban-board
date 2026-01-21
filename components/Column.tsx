@@ -1,6 +1,7 @@
-import { deleteColumn } from "@/actions/kanban";
+'use client';
+import { deleteColumn, moveTask } from "@/actions/kanban";
 import { ColumnWithTasks } from "@/types";
-import React from "react";
+import React, { useState } from "react";
 import TaskCard from "./TaskCard";
 import CreateTask from "./CreateTask";
 
@@ -9,6 +10,40 @@ interface Props {
   boardId: string;
 }
 const Column = ({ column, boardId }: Props) => {
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const taskId = e.dataTransfer.getData("taskId");
+    const sourceColumnId = e.dataTransfer.getData("sourceColumnId");
+
+    if (!taskId || !sourceColumnId) return;
+
+    const formData = new FormData();
+    formData.append("taskId", taskId);
+    formData.append("newColumnId", column.id);
+    formData.append("boardId", boardId);
+    formData.append("newOrder", column.tasks.length.toString());
+
+    try {
+      await moveTask(formData);
+    } catch (error) {
+      console.error("Failed to move task:", error);
+    }
+  };
+
   return (
     <div className="min-w-[320px] flex flex-col shrink-0">
       <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-2xl p-6 shadow-xl mb-4 sticky top-0 z-10">
@@ -46,9 +81,16 @@ const Column = ({ column, boardId }: Props) => {
         </div>
       </div>
 
-      <div className="flex-1 space-y-3 min-h-0 overflow-y-auto">
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`flex-1 space-y-3 min-h-0 overflow-y-auto rounded-xl transition-all ${
+          isDragOver ? "bg-indigo-50/50 border-2 border-indigo-300" : ""
+        }`}
+      >
         {column.tasks.map((task) => (
-            <TaskCard key={task.id} task={task} />
+            <TaskCard key={task.id} task={task} columnId={column.id} />
         ))}
 
         <CreateTask columnId={column.id} boardId={boardId} />
