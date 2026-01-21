@@ -17,7 +17,7 @@ const Register = () => {
         setIsLoading(true); 
         setError('');
         try {
-            const res = await fetch(`${BASE_URL}/api/auth/register`, {
+            const res = await fetch(`/api/auth/register`, {
                 method: 'POST',
                 body: JSON.stringify({ email, password, name }),
                 headers: { 'Content-Type': 'application/json' }

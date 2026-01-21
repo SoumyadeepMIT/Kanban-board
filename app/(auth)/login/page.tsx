@@ -2,7 +2,6 @@
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 const Login = () => {
     const [error, setError] = useState('');
     const [email, setEmail] = useState('');
@@ -15,7 +14,7 @@ const Login = () => {
         setIsLoading(true);
         setError('');
         try {
-            const res = await fetch(`${BASE_URL}/api/auth/login`, {
+            const res = await fetch(`/api/auth/login`, {
                 method: 'POST',
                 body: JSON.stringify({ email, password }),
                 headers: { 'Content-Type': 'application/json' }
