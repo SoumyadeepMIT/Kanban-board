@@ -1,6 +1,7 @@
 import Column from '@/components/Column';
 import CreateColumn from '@/components/CreateColumn';
 import { prisma } from '@/lib/prisma';
+import { ColumnWithTasks } from '@/types';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import React from 'react'
@@ -62,7 +63,7 @@ const Board = async ({ params }: Props) => {
             </div>
           ): (
             <>
-              {board.columns.map((column) => (
+              {board.columns.map((column: ColumnWithTasks) => (
                 <Column 
                   key = {column.id}
                   column = {column}
